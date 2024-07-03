@@ -1,0 +1,8 @@
+telegram:
+  bot:
+    username: "FlipResponseBot"
+    token: ${BOT_TOKEN}
+    image-dir: ${IMAGE_DIR}
+    flip-messages:
+      - Флип!
+      - Flip!
