@@ -1,20 +1,18 @@
 package com.github.elimxim.fliptbot
 
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import org.telegram.telegrambots.bots.DefaultBotOptions
 import org.telegram.telegrambots.bots.TelegramLongPollingBot
-import org.telegram.telegrambots.meta.api.methods.send.SendPhoto
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage
 import org.telegram.telegrambots.meta.api.methods.send.SendSticker
 import org.telegram.telegrambots.meta.api.objects.InputFile
 import org.telegram.telegrambots.meta.api.objects.Message
 import org.telegram.telegrambots.meta.api.objects.Update
-import java.io.InputStream
 import java.nio.file.Files
 import kotlin.io.path.*
 
 class FlipBot(
     private val botProperties: TelegramBotProperties,
+    private val flipCounter: FlipCounter,
     botOptions: DefaultBotOptions
 ) : TelegramLongPollingBot(botOptions, botProperties.token) {
     override fun getBotUsername(): String {
@@ -23,10 +21,25 @@ class FlipBot(
 
     override fun onUpdateReceived(update: Update) {
         if (update.hasMessage()) {
-            if (isFlip(update.message)) {
+            if (isTimesCommand(update.message)) {
+                sendCounter(update)
+            } else if (isFlip(update.message)) {
                 sendFlip(update)
+                flipCounter.increment()
             }
         }
+    }
+
+    private fun isTimesCommand(message: Message): Boolean {
+        return message.hasText() && message.text == TIMES_COMMAND
+    }
+
+    private fun sendCounter(update: Update) {
+        val counter = flipCounter.get()
+        execute(SendMessage().apply {
+            chatId = update.message.chatId.toString()
+            text = counter.toString()
+        })
     }
 
     private fun isFlip(message: Message): Boolean {
@@ -52,6 +65,6 @@ class FlipBot(
     }
 
     companion object {
-        private val log: Logger = LoggerFactory.getLogger(FlipBot::class.java)
+        private const val TIMES_COMMAND = "/times"
     }
 }

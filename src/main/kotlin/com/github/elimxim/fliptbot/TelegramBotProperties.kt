@@ -17,6 +17,9 @@ class TelegramBotProperties {
     var token: String? = null
 
     @NotNull
+    var countDir: Path? = null
+
+    @NotNull
     var imageDir: Path? = null
 
     @NotEmpty

@@ -12,8 +12,13 @@ import org.telegram.telegrambots.updatesreceivers.DefaultBotSession
 open class TelegramBotConfig(private val botProperties: TelegramBotProperties) {
 
     @Bean
+    open fun flipCounter(): FlipCounter {
+        return FlipCounter(botProperties.countDir!!)
+    }
+
+    @Bean
     open fun flipBot(): FlipBot {
-        return FlipBot(botProperties, DefaultBotOptions())
+        return FlipBot(botProperties, flipCounter(), DefaultBotOptions())
     }
 
     @Bean
